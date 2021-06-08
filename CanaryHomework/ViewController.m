@@ -75,7 +75,7 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSString *deviceIDString = [self.devices[indexPath.row].deviceID stringValue];
-    DetailViewController *dc = [[DetailViewController new] initWithDeviceID:deviceIDString];
+    DetailViewController *dc = [[DetailViewController new] initWithDeviceID:deviceIDString andName: self.devices[indexPath.row].name];
     [self.navigationController pushViewController:dc animated:YES];
 }
 

@@ -14,9 +14,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface DetailViewController : UIViewController
 
 @property(nonatomic, retain)NSString *deviceID;
+@property(nonatomic, retain)NSString *deviceName;
 @property(nonatomic, retain)NSArray<Reading *> *readings;
 
-- (id)initWithDeviceID:(NSString *)deviceID;
+- (id)initWithDeviceID:(NSString *)deviceID andName: (NSString *) deviceName;
 
 @end
 
