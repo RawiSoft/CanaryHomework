@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Reading (ParserLogic)
 
-+ (Reading *)readingFromDictionary:(NSDictionary *)dictionary forDevice:(NSString *)deviceID managedObjectContext:(NSManagedObjectContext *)managedObjectContext;
++ (Reading *)readingFromDictionary:(NSDictionary *)dictionary forDevice:(NSNumber *)deviceID managedObjectContext:(NSManagedObjectContext *)managedObjectContext;
 
 @end
 

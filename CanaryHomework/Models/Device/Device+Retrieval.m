@@ -28,5 +28,4 @@
     return device;
 }
 
-
 @end

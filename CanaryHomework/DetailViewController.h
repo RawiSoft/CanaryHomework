@@ -7,10 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Device+CoreDataProperties.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface DetailViewController : UIViewController
+
+@property(nonatomic, retain)NSString *deviceID;
+@property(nonatomic, retain)NSArray<Reading *> *readings;
+
+- (id)initWithDeviceID:(NSString *)deviceID;
 
 @end
 

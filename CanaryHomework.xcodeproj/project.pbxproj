@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		A9AD7C30266FA4CD00D68086 /* AFNetworking in Frameworks */ = {isa = PBXBuildFile; productRef = A9AD7C2F266FA4CD00D68086 /* AFNetworking */; };
+		A9AD7C33266FB37F00D68086 /* StringToNumberConverter.m in Sources */ = {isa = PBXBuildFile; fileRef = A9AD7C32266FB37F00D68086 /* StringToNumberConverter.m */; };
 		B21CD57B233A9320006994CA /* APICLient.m in Sources */ = {isa = PBXBuildFile; fileRef = B21CD57A233A9320006994CA /* APICLient.m */; };
 		B21CD582233AAE02006994CA /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B21CD581233AAE02006994CA /* DetailViewController.m */; };
 		B21CD585233AB8B4006994CA /* CoreDataController.m in Sources */ = {isa = PBXBuildFile; fileRef = B21CD584233AB8B4006994CA /* CoreDataController.m */; };
@@ -28,6 +29,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A9AD7C31266FB31900D68086 /* StringToNumberConverter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StringToNumberConverter.h; sourceTree = "<group>"; };
+		A9AD7C32266FB37F00D68086 /* StringToNumberConverter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StringToNumberConverter.m; sourceTree = "<group>"; };
 		B21CD57A233A9320006994CA /* APICLient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = APICLient.m; sourceTree = "<group>"; };
 		B21CD57C233A932E006994CA /* APIClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = APIClient.h; sourceTree = "<group>"; };
 		B21CD57E233A93F3006994CA /* Keys.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Keys.h; sourceTree = "<group>"; };
@@ -122,6 +125,8 @@
 		B28912CC233BA98C00F0C3C5 /* Util */ = {
 			isa = PBXGroup;
 			children = (
+				A9AD7C31266FB31900D68086 /* StringToNumberConverter.h */,
+				A9AD7C32266FB37F00D68086 /* StringToNumberConverter.m */,
 				B28912CD233BA9AF00F0C3C5 /* DateFormatter.h */,
 				B28912CE233BA9AF00F0C3C5 /* DateFormatter.m */,
 			);
@@ -265,6 +270,7 @@
 				B2E7095423341732009B864F /* Reading+CoreDataClass.m in Sources */,
 				B2E709352333FF38009B864F /* ViewController.m in Sources */,
 				B2AC60DC233540C300A5823F /* CoreDataManager.m in Sources */,
+				A9AD7C33266FB37F00D68086 /* StringToNumberConverter.m in Sources */,
 				B2E7093B2333FF38009B864F /* CanaryHomework.xcdatamodeld in Sources */,
 				B28912D3233BAFC200F0C3C5 /* Reading+ParserLogic.m in Sources */,
 				B21CD57B233A9320006994CA /* APICLient.m in Sources */,
