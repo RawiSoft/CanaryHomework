@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A9AD7C30266FA4CD00D68086 /* AFNetworking in Frameworks */ = {isa = PBXBuildFile; productRef = A9AD7C2F266FA4CD00D68086 /* AFNetworking */; };
 		B21CD57B233A9320006994CA /* APICLient.m in Sources */ = {isa = PBXBuildFile; fileRef = B21CD57A233A9320006994CA /* APICLient.m */; };
 		B21CD582233AAE02006994CA /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B21CD581233AAE02006994CA /* DetailViewController.m */; };
 		B21CD585233AB8B4006994CA /* CoreDataController.m in Sources */ = {isa = PBXBuildFile; fileRef = B21CD584233AB8B4006994CA /* CoreDataController.m */; };
@@ -68,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9AD7C30266FA4CD00D68086 /* AFNetworking in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,6 +205,7 @@
 			);
 			name = CanaryHomework;
 			packageProductDependencies = (
+				A9AD7C2F266FA4CD00D68086 /* AFNetworking */,
 			);
 			productName = CanaryHomework;
 			productReference = B2E7092D2333FF38009B864F /* CanaryHomework.app */;
@@ -232,6 +235,7 @@
 			);
 			mainGroup = B2E709242333FF38009B864F;
 			packageReferences = (
+				A9AD7C2E266FA4CD00D68086 /* XCRemoteSwiftPackageReference "AFNetworking" */,
 			);
 			productRefGroup = B2E7092E2333FF38009B864F /* Products */;
 			projectDirPath = "";
@@ -460,6 +464,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A9AD7C2E266FA4CD00D68086 /* XCRemoteSwiftPackageReference "AFNetworking" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AFNetworking/AFNetworking.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A9AD7C2F266FA4CD00D68086 /* AFNetworking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A9AD7C2E266FA4CD00D68086 /* XCRemoteSwiftPackageReference "AFNetworking" */;
+			productName = AFNetworking;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		B2E709392333FF38009B864F /* CanaryHomework.xcdatamodeld */ = {
