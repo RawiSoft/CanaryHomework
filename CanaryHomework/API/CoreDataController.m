@@ -81,6 +81,8 @@
     __weak typeof(self) weakSelf = self;
     dispatch_async(self.reloadQueue, ^ {
         [[APIClient sharedClient] getDevice:deviceID readingsWithCompletionBlock:^(BOOL success, id responseObject) {
+            dispatch_async(weakSelf.reloadQueue, ^ {
+
             if (success) {
                 NSNumber *deviceIDNumber = [[StringToNumberConverter sharedConverter] numberFromString:deviceID];
                 Device *device = [Device deviceWithID:deviceIDNumber managedObjectContext:self.privateObjectContext createIfNeeded:YES];
@@ -90,17 +92,14 @@
 
                 } completionBlock:^(NSArray *objects, NSError *error) {
                     if (completionBlock != nil){
-                        dispatch_async(dispatch_get_main_queue(), ^{
                             completionBlock(YES, YES, objects);
-                        });
                     }
                 }];
             } else if ( completionBlock != nil ) {
                 NSArray *errorsArray = responseObject;
-                dispatch_async(dispatch_get_main_queue(), ^{
                     completionBlock(YES, NO, errorsArray);
-                });
             }
+            });
         }];
     });
 }

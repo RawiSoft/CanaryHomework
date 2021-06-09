@@ -11,57 +11,72 @@
 #import "Device+CoreDataProperties.h"
 #import "Reading+CoreDataProperties.h"
 #import "Constants.h"
+/**
+ * This will handle all the logic from fetching readings to
+ * process Min, Max and Average for each sensor type
+ */
 @interface DetailView ()
 
 @property(nonatomic, retain) NSMutableArray<NSNumber *> *temperatureValues;
 @property(nonatomic, retain) NSMutableArray<NSNumber *> *humidityValues;
 @property(nonatomic, retain) NSMutableArray<NSNumber *> *airQualityValues;
-@property (strong, nonatomic) dispatch_queue_t fetchQueue;
+@property (strong, nonatomic) dispatch_queue_t processReadingsQueue;
 
 @end
 
 @implementation DetailView
 
-- (id)initWithDeviceID:(NSString *)deviceID {
+- (instancetype)init {
     
     self = [super init];
     if (self) {
-        self.deviceID = deviceID;
-        _fetchQueue = dispatch_queue_create("is.canary.DetailView.fetchQueue", DISPATCH_QUEUE_SERIAL);
+        // a private  queue for processing the readings
+        // for each sensor and get the Min, Max and Average
+        _processReadingsQueue = dispatch_queue_create("is.canary.DetailView.processReadingsQueue",
+                                            DISPATCH_QUEUE_SERIAL);
         self.temperatureValues = [NSMutableArray new];
         self.humidityValues = [NSMutableArray new];
         self.airQualityValues = [NSMutableArray new];
-//        [self fetchReadings];
     }
     return self;
 }
 
-- (void)fetchReadings:(DetailViewCompletionBlock)completionBlock {
+ - (void)fetchReadingsForDeviceID: (NSString *)deviceID
+                       withCompletion:(DetailViewCompletionBlock)completionBlock {
     __weak typeof(self) weakSelf = self;
-    dispatch_async(self.fetchQueue, ^ {
         
-        [[CoreDataController sharedCache] getReadingsForDevice:self.deviceID completionBlock:^(BOOL completed, BOOL success, NSArray * _Nonnull objects) {
+        [[CoreDataController sharedCache]
+         getReadingsForDevice:deviceID
+         completionBlock:^(BOOL completed,
+                           BOOL success,
+                           NSArray * _Nonnull objects) {
+            dispatch_async(self.processReadingsQueue, ^ {
             if (success) {
                 weakSelf.readings = objects;
                 NSLog(@"%@%@",self.readings,@"fetchReadings Detail View");
                 [weakSelf updateData];
                 if (completionBlock != nil){
-                    
                     completionBlock(YES, YES,[weakSelf getFinalReadingsDict] );
                 }
             }else {
                 NSMutableDictionary<NSString *, NSNumber *> *dict = [[NSMutableDictionary alloc]initWithCapacity:0];
                 completionBlock(YES, NO, dict);
             }
+            });
         }];
         
-    });
+   
 
 }
+/**
+ * Distribute the readings into three different arrays
+ * temperatureValues, humidityValues and airQualityValues
+ * that will use "processReadingsQueue"
+ */
 - (void)updateData {
     // updating the values arrays
     for (int i = 0; i < self.readings.count; i++)
-        {
+    {
         Reading *reading = self.readings[i];
         NSLog(@"%@%@%@",reading.type,@" self.updateLabelAndData ",reading.value);
         if ([reading.type isEqualToString:@"temperature"]) {
@@ -71,28 +86,40 @@
         } else if ([reading.type isEqualToString:@"airquality"]) {
             [self.airQualityValues addObject: reading.value];
         }
-        }
-    
-
+    }
 }
+/**
+ *  process the final readings in"processReadingsQueue" by
+ *  getting the Min, Max and  Average values from the
+ *  three arrays temperatureValues, humidityValues and airQualityValues
+ *  and then add all the results into a dictionary
+ */
 - (NSMutableDictionary<NSString *, NSNumber *> *)getFinalReadingsDict {
     NSMutableDictionary<NSString *, NSNumber *> *dict = [[NSMutableDictionary alloc]initWithCapacity:10];
-    [self getMinTemperature] != nil ? [dict setObject:[self getMinTemperature] forKey: MIN_TEMPERATURE_KEY] : @0 ;
+    [self getMinTemperature] != nil ?
+    [dict setObject:[self getMinTemperature] forKey: MIN_TEMPERATURE_KEY] : @0 ;
     
-    [self getMaxTemperature] != nil ? [dict setObject:[self getMaxTemperature] forKey: MAX_TEMPERATURE_KEY] : @0 ;
+    [self getMaxTemperature] != nil ?
+    [dict setObject:[self getMaxTemperature] forKey: MAX_TEMPERATURE_KEY] : @0 ;
     
-    [self getAverageTemperature] != nil ? [dict setObject:[self getAverageTemperature] forKey: AVERAGE_TEMPERATURE_KEY] : @0 ;
+    [self getAverageTemperature] != nil ?
+    [dict setObject:[self getAverageTemperature] forKey: AVERAGE_TEMPERATURE_KEY] : @0 ;
     
-    [self getMinHumidity] != nil ? [dict setObject:[self getMinHumidity] forKey:MIN_HUMIDITY_KEY] : @0 ;
+    [self getMinHumidity] != nil ?
+    [dict setObject:[self getMinHumidity] forKey:MIN_HUMIDITY_KEY] : @0 ;
 
-    [self getMaxHumidity] != nil ? [dict setObject:[self getMaxHumidity] forKey:MAX_HUMIDITY_KEY] : @0 ;
+    [self getMaxHumidity] != nil ?
+    [dict setObject:[self getMaxHumidity] forKey:MAX_HUMIDITY_KEY] : @0 ;
 
-    [self getAverageHumidity] != nil ? [dict setObject:[self getAverageHumidity] forKey:AVERAGE_HUMIDITY_KEY] : @0 ;
-    [self getMinAirQuality] != nil ? [dict setObject:[self getMinAirQuality] forKey:MIN_AIR_QUALITY_KEY] : @0 ;
-    [self getMaxAirQuality] != nil ? [dict setObject:[self getMaxAirQuality] forKey:MAX_AIR_QUALITY_KEY] : @0 ;
+    [self getAverageHumidity] != nil ?
+    [dict setObject:[self getAverageHumidity] forKey:AVERAGE_HUMIDITY_KEY] : @0 ;
+    [self getMinAirQuality] != nil ?
+    [dict setObject:[self getMinAirQuality] forKey:MIN_AIR_QUALITY_KEY] : @0 ;
+    [self getMaxAirQuality] != nil ?
+    [dict setObject:[self getMaxAirQuality] forKey:MAX_AIR_QUALITY_KEY] : @0 ;
 
-    [self getAverageAirQuality] != nil ? [dict setObject:[self getAverageAirQuality] forKey:AVERAGE_AIR_QUALITY_KEY] : @0 ;
-    
+    [self getAverageAirQuality] != nil ?
+    [dict setObject:[self getAverageAirQuality] forKey:AVERAGE_AIR_QUALITY_KEY] : @0 ;
     return dict;
 }
 - (NSNumber *)getMinTemperature {

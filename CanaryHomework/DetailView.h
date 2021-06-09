@@ -16,12 +16,10 @@ typedef void(^DetailViewCompletionBlock)(BOOL completed,
 
 @interface DetailView : NSObject
 
-@property(nonatomic, retain)NSString *deviceID;
 @property(nonatomic, retain)NSArray<Reading *> *readings;
 
-- (id)initWithDeviceID:(NSString *)deviceID;
-- (void)fetchReadings: (DetailViewCompletionBlock)completionBlock;
-
+- (void)fetchReadingsForDeviceID: (NSString *)deviceID
+                  withCompletion:(DetailViewCompletionBlock)completionBlock;
 @end
 
 NS_ASSUME_NONNULL_END

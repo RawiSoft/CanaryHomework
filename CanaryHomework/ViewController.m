@@ -49,7 +49,9 @@
 }
 
 - (void)fetchDevices {
-    [[CoreDataController sharedCache] getAllDevices:^(BOOL completed, BOOL success, NSArray * _Nonnull objects) {
+    [[CoreDataController sharedCache] getAllDevices:^(BOOL completed,
+                                                      BOOL success,
+                                                      NSArray * _Nonnull objects) {
         if (success) {
             self.devices = objects;
             dispatch_async(dispatch_get_main_queue(), ^{
