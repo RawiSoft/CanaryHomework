@@ -10,6 +10,6 @@
 
 @interface Device (Retrieval)
 
-+ (Device *)deviceWithID:(NSString *)deviceID managedObjectContext:(NSManagedObjectContext *)managedObjectContext createIfNeeded:(BOOL)createIfNeeded;
++ (Device *)deviceWithID:(NSNumber *)deviceID managedObjectContext:(NSManagedObjectContext *)managedObjectContext createIfNeeded:(BOOL)createIfNeeded;
 
 @end

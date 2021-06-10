@@ -8,11 +8,14 @@
 
 #import "ViewController.h"
 #import "DetailViewController.h"
+#import "Device+CoreDataProperties.h"
+#import "CoreDataController.h"
 
 @interface ViewController ()
 
 @property(nonatomic, retain) UITableView *tableView;
 @property(nonatomic, retain) UILayoutGuide *safeArea;
+@property(nonatomic, retain) NSArray<Device *> *devices;
 
 @end
 
@@ -28,6 +31,7 @@
     self.safeArea = self.view.layoutMarginsGuide;
     self.view.backgroundColor = [UIColor whiteColor];
     [self setupTableView];
+    [self fetchDevices];
 }
 
 - (void)setupTableView {
@@ -44,22 +48,36 @@
     self.tableView.delegate = self;
 }
 
+- (void)fetchDevices {
+    [[CoreDataController sharedCache] getAllDevices:^(BOOL completed,
+                                                      BOOL success,
+                                                      NSArray * _Nonnull objects) {
+        if (success) {
+            self.devices = objects;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.tableView reloadData];
+            });
+        }
+    }];
+}
+
 #pragma mark - UITableView Data Source
 
 - (nonnull UITableViewCell *)tableView:(nonnull UITableView *)tableView cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
     UITableViewCell *cell  = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
-    cell.textLabel.text = @"data";
+    cell.textLabel.text = self.devices[indexPath.row].name;
     return cell;
 }
 
 - (NSInteger)tableView:(nonnull UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 10;
+    return self.devices.count;
 }
 
 #pragma mark UITableView Delegate 
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    DetailViewController *dc = [DetailViewController new];
+    NSString *deviceIDString = [self.devices[indexPath.row].deviceID stringValue];
+    DetailViewController *dc = [[DetailViewController new] initWithDeviceID:deviceIDString andName: self.devices[indexPath.row].name];
     [self.navigationController pushViewController:dc animated:YES];
 }
 

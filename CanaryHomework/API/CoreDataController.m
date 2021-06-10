@@ -12,7 +12,7 @@
 #import "Device+ParserLogic.h"
 #import "Reading+ParserLogic.h"
 #import "Device+Retrieval.h"
-
+#import "StringToNumberConverter.h"
 
 @interface CoreDataController ()
 
@@ -81,16 +81,25 @@
     __weak typeof(self) weakSelf = self;
     dispatch_async(self.reloadQueue, ^ {
         [[APIClient sharedClient] getDevice:deviceID readingsWithCompletionBlock:^(BOOL success, id responseObject) {
+            dispatch_async(weakSelf.reloadQueue, ^ {
+
             if (success) {
-                Device *device = [Device deviceWithID:deviceID managedObjectContext:self.privateObjectContext createIfNeeded:YES];
+                NSNumber *deviceIDNumber = [[StringToNumberConverter sharedConverter] numberFromString:deviceID];
+                Device *device = [Device deviceWithID:deviceIDNumber managedObjectContext:self.privateObjectContext createIfNeeded:YES];
                 [device removeReadings:device.readings];
                 [weakSelf insertObjectsWithDictionaries:responseObject withCreationBlock:^NSManagedObject *(NSDictionary *dictionary, NSManagedObjectContext *insertContext) {
-                    return [Reading readingFromDictionary:dictionary forDevice:deviceID managedObjectContext:insertContext];
+                    return [Reading readingFromDictionary:dictionary forDevice:deviceIDNumber managedObjectContext:insertContext];
 
                 } completionBlock:^(NSArray *objects, NSError *error) {
-                    
+                    if (completionBlock != nil){
+                            completionBlock(YES, YES, objects);
+                    }
                 }];
+            } else if ( completionBlock != nil ) {
+                NSArray *errorsArray = responseObject;
+                    completionBlock(YES, NO, errorsArray);
             }
+            });
         }];
     });
 }

@@ -9,10 +9,11 @@
 #import "Reading+ParserLogic.h"
 #import "Device+Retrieval.h"
 #import "DateFormatter.h"
+#import "StringToNumberConverter.h"
 
 @implementation Reading (ParserLogic)
 
-+ (Reading *)readingFromDictionary:(NSDictionary *)dictionary forDevice:(nonnull NSString *)deviceID managedObjectContext:(nonnull NSManagedObjectContext *)managedObjectContext
++ (Reading *)readingFromDictionary:(NSDictionary *)dictionary forDevice:(nonnull NSNumber *)deviceID managedObjectContext:(nonnull NSManagedObjectContext *)managedObjectContext
 {
     Device *device = [Device deviceWithID:deviceID managedObjectContext:managedObjectContext createIfNeeded:false];
     
@@ -22,7 +23,8 @@
     
     Reading *reading = [NSEntityDescription insertNewObjectForEntityForName:@"Reading" inManagedObjectContext:managedObjectContext];
     reading.createdAt = [[DateFormatter sharedFormatter] dateFromAPIString:dictionary[@"createdAt"]];
-    reading.value =  dictionary[@"value"];
+    reading.value =  [[StringToNumberConverter sharedConverter]
+        numberFromString:dictionary[@"value"]];
     reading.type = dictionary[@"type"];
     reading.device = device;
     return reading;
