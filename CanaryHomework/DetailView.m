@@ -17,9 +17,7 @@
  */
 @interface DetailView ()
 
-@property(nonatomic, retain) NSMutableArray<NSNumber *> *temperatureValues;
-@property(nonatomic, retain) NSMutableArray<NSNumber *> *humidityValues;
-@property(nonatomic, retain) NSMutableArray<NSNumber *> *airQualityValues;
+
 @property (strong, nonatomic) dispatch_queue_t processReadingsQueue;
 
 @end
@@ -34,9 +32,6 @@
         // for each sensor and get the Min, Max and Average
         _processReadingsQueue = dispatch_queue_create("is.canary.DetailView.processReadingsQueue",
                                             DISPATCH_QUEUE_SERIAL);
-        self.temperatureValues = [NSMutableArray new];
-        self.humidityValues = [NSMutableArray new];
-        self.airQualityValues = [NSMutableArray new];
     }
     return self;
 }
@@ -53,10 +48,9 @@
             dispatch_async(self.processReadingsQueue, ^ {
             if (success) {
                 weakSelf.readings = objects;
-                NSLog(@"%@%@",self.readings,@"fetchReadings Detail View");
-                [weakSelf updateData];
+                NSDictionary<NSString *,NSArray<NSNumber *> *> * dict =  [weakSelf extractSensorTypeValuesFrom: objects];
                 if (completionBlock != nil){
-                    completionBlock(YES, YES,[weakSelf getFinalReadingsDict] );
+                    completionBlock(YES, YES,[weakSelf getFinalReadingsDictFromDictionary:dict]);
                 }
             }else {
                 NSMutableDictionary<NSString *, NSNumber *> *dict = [[NSMutableDictionary alloc]initWithCapacity:0];
@@ -64,29 +58,32 @@
             }
             });
         }];
-        
-   
-
 }
 /**
  * Distribute the readings into three different arrays
  * temperatureValues, humidityValues and airQualityValues
  * that will use "processReadingsQueue"
  */
-- (void)updateData {
+- (NSDictionary<NSString *,NSArray<NSNumber *> *> *)extractSensorTypeValuesFrom: (NSArray<Reading *> *) readings {
     // updating the values arrays
-    for (int i = 0; i < self.readings.count; i++)
+    NSMutableArray<NSNumber *> *temperatureValues = [NSMutableArray new];
+    NSMutableArray<NSNumber *> *humidityValues = [NSMutableArray new];
+    NSMutableArray<NSNumber *> *airQualityValues = [NSMutableArray new];
+    
+    for (int i = 0; i < readings.count; i++)
     {
-        Reading *reading = self.readings[i];
-        NSLog(@"%@%@%@",reading.type,@" self.updateLabelAndData ",reading.value);
+        Reading *reading = readings[i];
         if ([reading.type isEqualToString:@"temperature"]) {
-            [self.temperatureValues addObject: reading.value];
+            [ temperatureValues addObject: reading.value];
         } else if ([reading.type isEqualToString:@"humidity"]) {
-            [self.humidityValues addObject: reading.value];
+            [humidityValues addObject: reading.value];
         } else if ([reading.type isEqualToString:@"airquality"]) {
-            [self.airQualityValues addObject: reading.value];
+            [ airQualityValues addObject: reading.value];
         }
     }
+    
+    NSMutableDictionary<NSString *,NSMutableArray *>  * readingsDictionary = [[NSMutableDictionary alloc] initWithObjectsAndKeys: temperatureValues, @"temperatureValues", humidityValues, @"humidityValues", airQualityValues, @"airQualityValues", nil];
+    return  readingsDictionary;
 }
 /**
  *  process the final readings in"processReadingsQueue" by
@@ -94,98 +91,64 @@
  *  three arrays temperatureValues, humidityValues and airQualityValues
  *  and then add all the results into a dictionary
  */
-- (NSMutableDictionary<NSString *, NSNumber *> *)getFinalReadingsDict {
+- (NSMutableDictionary<NSString *, NSNumber *> *)
+                                     getFinalReadingsDictFromDictionary:
+                                    (NSDictionary<NSString *,NSArray<NSNumber *> *> *)
+                                    sensorTypeValuesDict
+{
+    
     NSMutableDictionary<NSString *, NSNumber *> *dict = [[NSMutableDictionary alloc]initWithCapacity:10];
-    [self getMinTemperature] != nil ?
-    [dict setObject:[self getMinTemperature] forKey: MIN_TEMPERATURE_KEY] : @0 ;
-    
-    [self getMaxTemperature] != nil ?
-    [dict setObject:[self getMaxTemperature] forKey: MAX_TEMPERATURE_KEY] : @0 ;
-    
-    [self getAverageTemperature] != nil ?
-    [dict setObject:[self getAverageTemperature] forKey: AVERAGE_TEMPERATURE_KEY] : @0 ;
-    
-    [self getMinHumidity] != nil ?
-    [dict setObject:[self getMinHumidity] forKey:MIN_HUMIDITY_KEY] : @0 ;
-
-    [self getMaxHumidity] != nil ?
-    [dict setObject:[self getMaxHumidity] forKey:MAX_HUMIDITY_KEY] : @0 ;
-
-    [self getAverageHumidity] != nil ?
-    [dict setObject:[self getAverageHumidity] forKey:AVERAGE_HUMIDITY_KEY] : @0 ;
-    [self getMinAirQuality] != nil ?
-    [dict setObject:[self getMinAirQuality] forKey:MIN_AIR_QUALITY_KEY] : @0 ;
-    [self getMaxAirQuality] != nil ?
-    [dict setObject:[self getMaxAirQuality] forKey:MAX_AIR_QUALITY_KEY] : @0 ;
-
-    [self getAverageAirQuality] != nil ?
-    [dict setObject:[self getAverageAirQuality] forKey:AVERAGE_AIR_QUALITY_KEY] : @0 ;
+    NSArray<NSNumber *> *temperatureValues = sensorTypeValuesDict[@"temperatureValues"];
+    if (temperatureValues != nil ){
+    [self getMinValueFrom: temperatureValues] != nil ?
+    [dict setObject:[self getMinValueFrom: temperatureValues] forKey: MIN_TEMPERATURE_KEY] : @0 ;
+    [self getMaxValueFrom: temperatureValues] != nil ?
+    [dict setObject:[self getMaxValueFrom: temperatureValues] forKey: MAX_TEMPERATURE_KEY] : @0 ;
+    [self getAverageValueFrom: temperatureValues] != nil ?
+    [dict setObject:[self getAverageValueFrom: temperatureValues] forKey: AVERAGE_TEMPERATURE_KEY] : @0 ;
+    }
+    NSArray<NSNumber *> *humidityValues = sensorTypeValuesDict[@"humidityValues"];
+    if (humidityValues != nil ){
+    [self getMinValueFrom: humidityValues] != nil ?
+    [dict setObject:[self getMinValueFrom: humidityValues] forKey:MIN_HUMIDITY_KEY] : @0 ;
+    [self getMaxValueFrom: humidityValues] != nil ?
+    [dict setObject:[self getMaxValueFrom: humidityValues] forKey:MAX_HUMIDITY_KEY] : @0 ;
+    [self getAverageValueFrom: humidityValues] != nil ?
+    [dict setObject:[self getAverageValueFrom: humidityValues] forKey:AVERAGE_HUMIDITY_KEY] : @0 ;
+    }
+    NSArray<NSNumber *> *airQualityValues = sensorTypeValuesDict[@"airQualityValues"];
+    if (humidityValues != nil ){
+    [self getMinValueFrom: airQualityValues] != nil ?
+    [dict setObject:[self getMinValueFrom: airQualityValues] forKey:MIN_AIR_QUALITY_KEY] : @0 ;
+    [self getMaxValueFrom: airQualityValues] != nil ?
+    [dict setObject:[self getMaxValueFrom: airQualityValues] forKey:MAX_AIR_QUALITY_KEY] : @0 ;
+    [self getAverageValueFrom: airQualityValues] != nil ?
+    [dict setObject:[self getAverageValueFrom: airQualityValues] forKey:AVERAGE_AIR_QUALITY_KEY] : @0 ;
+    }
     return dict;
 }
-- (NSNumber *)getMinTemperature {
-    if (self.temperatureValues.count == 0) {
+
+- (NSNumber *)getMinValueFrom: (NSArray<NSNumber *> *) values {
+    if (values.count == 0) {
         return nil;
     }
-    NSNumber *temperatureMin = [self.temperatureValues valueForKeyPath:@"@min.self"];
-    return temperatureMin;
-}
-- (NSNumber *)getMaxTemperature {
-    if (self.temperatureValues.count == 0) {
-        return nil;
-    }
-    NSNumber *temperatureMax = [self.temperatureValues valueForKeyPath:@"@max.self"];
-    return temperatureMax;
-}
-- (NSNumber *)getAverageTemperature {
-    if (self.temperatureValues.count == 0) {
-        return nil;
-    }
-    NSNumber *temperatureAverage = [self.temperatureValues valueForKeyPath:@"@avg.self"];
-    return temperatureAverage;
+    NSNumber *minValue = [values valueForKeyPath:@"@min.self"];
+    return minValue;
 }
 
-- (NSNumber *)getMinHumidity {
-    if (self.humidityValues.count == 0) {
+- (NSNumber *)getMaxValueFrom: (NSArray<NSNumber *> *) values {
+    if (values.count == 0) {
         return nil;
     }
-    NSNumber *humidityMin = [self.humidityValues valueForKeyPath:@"@min.self"];
-    return humidityMin;
-}
-- (NSNumber *)getMaxHumidity {
-    if (self.humidityValues.count == 0) {
-        return nil;
-    }
-    NSNumber *humidityMax = [self.humidityValues valueForKeyPath:@"@max.self"];
-    return humidityMax;
-}
-- (NSNumber *)getAverageHumidity {
-    if (self.humidityValues.count == 0) {
-        return nil;
-    }
-    NSNumber *humidityAverage = [self.humidityValues valueForKeyPath:@"@avg.self"];
-    return humidityAverage;
+    NSNumber *maxValue = [values valueForKeyPath:@"@max.self"];
+    return maxValue;
 }
 
-- (NSNumber *)getMinAirQuality {
-    if (self.airQualityValues.count == 0) {
+- (NSNumber *)getAverageValueFrom: (NSArray<NSNumber *> *) values {
+    if (values.count == 0) {
         return nil;
     }
-
-    NSNumber *airQualityMax = [self.airQualityValues valueForKeyPath:@"@max.self"];
-    return airQualityMax;
-}
-- (NSNumber *)getMaxAirQuality {
-    if (self.airQualityValues.count == 0) {
-        return nil;
-    }
-    NSNumber *airQualityMin = [self.airQualityValues valueForKeyPath:@"@min.self"];
-    return airQualityMin;
-}
-- (NSNumber *)getAverageAirQuality {
-    if (self.airQualityValues.count == 0) {
-        return nil;
-    }
-    NSNumber *airQualityAverage = [self.airQualityValues valueForKeyPath:@"@avg.self"];
-    return airQualityAverage;
+    NSNumber *avgValue = [values valueForKeyPath:@"@avg.self"];
+    return avgValue;
 }
 @end

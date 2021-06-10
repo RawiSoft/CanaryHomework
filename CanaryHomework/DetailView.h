@@ -20,6 +20,14 @@ typedef void(^DetailViewCompletionBlock)(BOOL completed,
 
 - (void)fetchReadingsForDeviceID: (NSString *)deviceID
                   withCompletion:(DetailViewCompletionBlock)completionBlock;
+- (NSMutableDictionary<NSString *, NSNumber *> *)
+                                getFinalReadingsDictFrom: (NSArray<NSNumber *> *) temperatureValues
+                                humidity: (NSArray<NSNumber *> *) humidityValues
+                                andAirQuality: (NSArray<NSNumber *> *) airQualityValues;
+- (NSDictionary<NSString *,NSArray *>  *)extractSensorTypeValuesFrom: (NSArray<Reading *> *) readings;
+- (NSNumber *)getMinValueFrom: (NSArray<NSNumber *> *) values;
+- (NSNumber *)getMaxValueFrom: (NSArray<NSNumber *> *) values;
+- (NSNumber *)getAverageValueFrom: (NSArray<NSNumber *> *) values;
 @end
 
 NS_ASSUME_NONNULL_END
